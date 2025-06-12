@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import readline from 'readline';
 import { OpenAI } from 'openai';
-import { applyEdit, parseEditResponse } from './fileEditor';
 import { handleToolCall, toolsToPromptString } from './tools/index';
 
 dotenv.config();
@@ -19,15 +18,7 @@ function askUser(prompt: string): Promise<string> {
 const tools = toolsToPromptString();
 
 const SYSTEM_PROMPT = `
-You are a helpful shell assistant. You can ask the user for permission to:
-- read a file
-- write or append to a file
-- replace specific content
-
-To edit a file, respond with:
-<edit filepath="FILEPATH" mode="replace|append|prepend">
-CONTENT TO WRITE OR REPLACE
-</edit>
+You are a helpful shell assistant.
 
 To use a tool, respond with:
 
@@ -41,6 +32,15 @@ To use a tool, respond with:
 You can also use the following tools:
 
 ${tools}
+
+If you need to use a subsequent tool, you can use the <continue> tag to keep talking.
+
+Guidance:
+1. Be proactive at using tools instead of asking.
+2. Assume you are somewhere in a repository with files.
+3. Confirm your changes worked
+ - Example: read the file after editing it.
+
 `;
 
 export async function askOpenAI(messages: Array<{ role: string, content: string }>) {
@@ -72,40 +72,38 @@ export async function runAssistant() {
 
     console.log("🤖 Shell Assistant. Type 'exit' to quit.");
 
+
     for await (const line of rl) {
-        const input = line.trim();
+        let shouldContinue = true;
+
+        let input = line.trim();
         if (input === 'exit') {
             console.log("👋 Goodbye!");
             rl.close();
             break;
         }
 
-        history.push({ role: 'user', content: input });
+        while (shouldContinue) {
+            shouldContinue = false;
 
-        const reply = await askOpenAI(history);
-        history.push({ role: 'assistant', content: reply });
-
-        const toolResult = await handleToolCall(reply);
-        if (toolResult) {
-            console.log(`🛠️ Tool Result:\n${toolResult}`);
-            history.push({ role: 'user', content: `Tool result:\n${toolResult}` });
-        } else {
+            history.push({ role: 'user', content: input });
+            const reply = await askOpenAI(history);
             history.push({ role: 'assistant', content: reply });
-        }
 
-        // Check for edit instruction
-        const editCommand = parseEditResponse(reply);
-        if (editCommand) {
-            const confirm = await askUser(`✏️ Do you want to apply changes to ${editCommand.filepath}? (y/n) `);
-            if (confirm === 'y') {
-                await applyEdit(editCommand);
-                history.push({ role: 'user', content: `The file was edited.` });
+            const toolResult = await handleToolCall(reply);
+            if (toolResult) {
+                shouldContinue = true; // Let the llm continue.
+                console.log(`🛠️ Tool Result:\n${toolResult}`);
+                history.push({ role: 'user', content: `Tool result:\n${toolResult}` });
+                input = "continue using the previous output.";
             } else {
-                history.push({ role: 'user', content: `Edit was cancelled.` });
+                history.push({ role: 'assistant', content: reply });
             }
+
+            console.log(`🤖 ${reply}`);
+
         }
 
-        console.log(`🤖 ${reply}`);
         rl.prompt();
     }
 }

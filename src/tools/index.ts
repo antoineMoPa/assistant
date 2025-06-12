@@ -1,9 +1,10 @@
 import { Tool } from './types';
-import { readFileTool, listFilesTool } from './fileTools';
+import { readFileTool, listFilesTool, editFileTool } from './fileTools';
 
 export const toolRegistry: Tool[] = [
     readFileTool,
     listFilesTool,
+    editFileTool,
 ];
 
 export function toolsToPromptString(): string {
@@ -27,6 +28,7 @@ export function parseToolCall(text: string): { tool: Tool, args: Record<string, 
         const args = JSON.parse(argStr);
         return { tool, args };
     } catch {
+        console.error(`Failed to parse arguments for tool ${name}:`, argStr);
         return null;
     }
 }

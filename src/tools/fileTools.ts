@@ -28,3 +28,33 @@ export const listFilesTool: Tool = {
         }
     }
 };
+
+export const editFileTool: Tool = {
+    name: "edit_file",
+    description: "Edits a file by appending content",
+    parameters: {
+        filepath: "string",
+        mode: "string|append|prepend",
+        content: "string"
+    },
+    run: async ({ filepath, mode, content }) => {
+        try {
+            let finalContent = content;
+
+            if (fs.existsSync(filepath)) {
+                const existingContent = fs.readFileSync(filepath, 'utf8');
+
+                if (mode === 'append') {
+                    finalContent = existingContent + '\n' + content;
+                } else if (mode === 'prepend') {
+                    finalContent = content + '\n' + existingContent;
+                }
+            }
+
+            fs.writeFileSync(filepath, finalContent, 'utf8');
+            return `✅ File edited successfully: ${filepath}`;
+        } catch (err: any) {
+            return `[Error] Failed to edit file: ${err.message}`;
+        }
+    }
+};
