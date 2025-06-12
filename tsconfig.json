@@ -1,12 +1,13 @@
 {
-  "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "strict": true,
-    "resolveJsonModule": true,
-    "outDir": "./dist"
-  },
-  "include": ["src"]
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "esModuleInterop": true,
+        "strict": true,
+        "resolveJsonModule": true,
+        "rootDir": "src",
+        "outDir": "./dist"
+    },
+    "include": ["src"]
 }
