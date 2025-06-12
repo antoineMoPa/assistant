@@ -33,8 +33,6 @@ You can also use the following tools:
 
 ${tools}
 
-If you need to use a subsequent tool, you can use the <continue> tag to keep talking.
-
 Guidance:
 1. Be proactive at using tools instead of asking.
 2. Assume you are somewhere in a repository with files.
