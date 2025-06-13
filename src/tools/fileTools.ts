@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { Tool } from './types';
 
-export const readFileTool: Tool = {
+const readFileTool: Tool = {
     name: "read_file",
     description: "Reads the content of a file",
     parameters: { path: "string" },
@@ -15,7 +15,7 @@ export const readFileTool: Tool = {
     }
 };
 
-export const listFilesTool: Tool = {
+const listFilesTool: Tool = {
     name: "list_files",
     description: "Lists files in a directory",
     parameters: { dir: "string" },
@@ -29,7 +29,7 @@ export const listFilesTool: Tool = {
     }
 };
 
-export const editFileTool: Tool = {
+const editFileTool: Tool = {
     name: "edit_file",
     description: "Edits a file by appending content",
     parameters: {
@@ -58,3 +58,9 @@ export const editFileTool: Tool = {
         }
     }
 };
+
+export const fileTools = [
+    readFileTool,
+    listFilesTool,
+    editFileTool
+];

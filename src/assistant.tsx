@@ -8,7 +8,7 @@ dotenv.config({ path: '~/.env' });
 const tools = toolsToPromptString();
 
 const SYSTEM_PROMPT = `
-You are a helpful shell assistant.
+You are a helpful shell assistant who can use tools to help the user with their coding tasks.
 
 To use a tool, respond with:
 
@@ -53,7 +53,7 @@ const startAssistant = () => {
         top: 0,
         left: 0,
         width: '100%',
-        height: '80%',
+        height: '90%',
         border: 'line',
         label: '🤖 Assistant',
         tags: true,
@@ -75,7 +75,7 @@ const startAssistant = () => {
         inputOnFocus: true,
         keys: true,
         vi: false,
-        mouse: true
+        mouse: false
     });
 
     screen.append(log);
@@ -125,8 +125,8 @@ const startAssistant = () => {
 
             const toolResult = await handleToolCall(reply);
             if (toolResult) {
-                log.log(`{magenta-fg} Tool Result:{/}\n${toolResult}`);
-                workingInput = `Tool result:\n${toolResult}`;
+                log.log(`{magenta-fg} Tool used:\n${toolResult.tool.name}`);
+                workingInput = `Tool used:\n${toolResult.result}`;
                 continueLoop = true;
             }
         }

@@ -1,10 +1,10 @@
 import { Tool } from './types';
-import { readFileTool, listFilesTool, editFileTool } from './fileTools';
+import { fileTools } from './fileTools';
+import { contextTools } from './contextTools';
 
 export const toolRegistry: Tool[] = [
-    readFileTool,
-    listFilesTool,
-    editFileTool,
+    ...fileTools,
+    ...contextTools,
 ];
 
 export function toolsToPromptString(): string {
@@ -33,9 +33,12 @@ export function parseToolCall(text: string): { tool: Tool, args: Record<string, 
     }
 }
 
-export async function handleToolCall(response: string): Promise<string | null> {
+export async function handleToolCall(response: string): Promise<{tool: Tool, result: string | null} | null> {
     const parsed = parseToolCall(response);
     if (!parsed) return null;
 
-    return await parsed.tool.run(parsed.args);
+    let tool = parsed.tool;
+    let result = await tool.run(parsed.args);
+
+    return { tool, result };
 }
