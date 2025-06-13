@@ -2,14 +2,16 @@
     "name": "shell-assistant",
     "type": "module",
     "version": "1.0.0",
-    "main": "src/assistant.ts",
     "scripts": {
         "start": "yarn run build && node dist/bundle.js",
         "test": "vitest run",
-        "build": "vite build"
+        "build": "vite build",
+        "prepare": "npm run build && chmod +x dist/bundle.js"
     },
     "dependencies": {
+        "blessed": "^0.1.81",
         "dotenv": "^16.0.3",
+        "modules": "^0.4.0",
         "openai": "^4.0.0"
     },
     "devDependencies": {
@@ -17,5 +19,9 @@
         "typescript": "^5.8.3",
         "vite": "^6.3.5",
         "vitest": "^1.0.0"
-    }
+    },
+    "bin": {
+        "assistant": "dist/bundle.js"
+    },
+    "postinstall": "npm run build && chmod +x dist/bundle.js"
 }
